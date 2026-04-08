@@ -164,10 +164,18 @@ export default function ClientProjectDetail() {
             {project.deadline_at && <div className="flex justify-between"><span className="text-gray-500">Prazo</span><span className="font-medium">{format(new Date(project.deadline_at), 'dd/MM/yyyy')}</span></div>}
             <div className="flex justify-between"><span className="text-gray-500">Revisões disp.</span><span className="font-medium">{(project.revisions_allowed || 0) - (project.revisions_used || 0)}</span></div>
           </div>
-          <div className="bg-indigo-50 rounded-xl p-4 flex items-start gap-2">
-            <Shield size={14} className="text-indigo-600 mt-0.5 flex-shrink-0" />
-            <p className="text-xs text-indigo-700">Pagamento em custódia, liberado somente após sua aprovação.</p>
-          </div>
+          {project.status === 'waiting_payment' && (
+  
+    href={`/cliente/projetos/${id}/pagamento`}
+    className="flex items-center justify-center gap-2 w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl text-sm font-semibold transition-colors"
+  >
+    💳 Pagar agora — R$ {parseFloat(project.total_amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+  </a>
+)}
+<div className="bg-indigo-50 rounded-xl p-4 flex items-start gap-2">
+  <Shield size={14} className="text-indigo-600 mt-0.5 flex-shrink-0" />
+  <p className="text-xs text-indigo-700">Pagamento em custódia, liberado somente após sua aprovação.</p>
+</div>
           {['in_progress','in_review','revision_requested'].includes(project.status) && (
             <Link to={`/cliente/disputas/nova?project=${id}`}
               className="flex items-center justify-center gap-2 w-full border border-red-200 text-red-600 hover:bg-red-50 py-2.5 rounded-xl text-sm font-medium transition-colors">
