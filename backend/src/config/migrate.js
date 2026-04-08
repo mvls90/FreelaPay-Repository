@@ -17,7 +17,7 @@ async function migrate() {
   console.log('🔌 Conectado ao PostgreSQL');
 
   try {
-const schemaPath = path.join(__dirname, '..', '..', '..', 'schema.sql');
+const schemaPath = path.join(__dirname, '..', '..', 'schema.sql');
     
     if (!fs.existsSync(schemaPath)) {
       throw new Error(`Schema não encontrado: ${schemaPath}`);
