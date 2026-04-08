@@ -59,26 +59,24 @@ const getProject = async (req, res) => {
     `SELECT p.*,
      f.full_name AS freelancer_name, f.avatar_url AS freelancer_avatar, f.trust_score AS freelancer_trust,
      c.full_name AS client_name, c.avatar_url AS client_avatar,
-     json_agg(DISTINCT jsonb_build_object(
-       'id', m.id, 'title', m.title, 'description', m.description,
-       'order_index', m.order_index, 'percentage', m.percentage,
-       'amount', m.amount, 'status', m.status, 'due_date', m.due_date,
-       'submitted_at', m.submitted_at, 'approved_at', m.approved_at
-     ) ORDER BY m.order_index) FILTER (WHERE m.id IS NOT NULL) AS milestones,
-     json_agg(DISTINCT jsonb_build_object(
-       'id', pu.id, 'title', pu.title, 'description', pu.description,
-       'progress_pct', pu.progress_pct, 'attachments', pu.attachments,
-       'is_delivery', pu.is_delivery, 'created_at', pu.created_at,
-       'author_name', ua.full_name
-     ) ORDER BY pu.created_at DESC) FILTER (WHERE pu.id IS NOT NULL) AS updates
+     (SELECT json_agg(m_ordered) FROM (
+       SELECT m.id, m.title, m.description, m.order_index, m.percentage,
+              m.amount, m.status, m.due_date, m.submitted_at, m.approved_at
+       FROM milestones m WHERE m.proposal_id = p.proposal_id
+       ORDER BY m.order_index
+     ) m_ordered) AS milestones,
+     (SELECT json_agg(u_ordered) FROM (
+       SELECT pu.id, pu.title, pu.description, pu.progress_pct,
+              pu.attachments, pu.is_delivery, pu.created_at, ua.full_name AS author_name
+       FROM project_updates pu
+       JOIN users ua ON pu.author_id = ua.id
+       WHERE pu.project_id = p.id
+       ORDER BY pu.created_at DESC
+     ) u_ordered) AS updates
      FROM projects p
      JOIN users f ON p.freelancer_id = f.id
      JOIN users c ON p.client_id = c.id
-     LEFT JOIN milestones m ON m.proposal_id = p.proposal_id
-     LEFT JOIN project_updates pu ON pu.project_id = p.id
-     LEFT JOIN users ua ON pu.author_id = ua.id
-     WHERE p.id = $1 AND (p.freelancer_id = $2 OR p.client_id = $2)
-     GROUP BY p.id, f.full_name, f.avatar_url, f.trust_score, c.full_name, c.avatar_url`,
+     WHERE p.id = $1 AND (p.freelancer_id = $2 OR p.client_id = $2)`,
     [id, req.user.id]
   );
 
