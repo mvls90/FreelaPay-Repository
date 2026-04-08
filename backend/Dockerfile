@@ -4,7 +4,7 @@ WORKDIR /app
 # Instalar dependências
 FROM base AS deps
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm install
 
 # Build final
 FROM base AS runner
