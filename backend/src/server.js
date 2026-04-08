@@ -28,12 +28,27 @@ const app    = express();
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  cors: { origin: process.env.FRONTEND_URL, methods: ['GET','POST'], credentials: true },
+  cors: { 
+  origin: [
+    process.env.FRONTEND_URL,
+    'https://freelapay-repository-production.up.railway.app',
+  ], 
+  methods: ['GET','POST'], 
+  credentials: true 
+},
 });
 
 // ── Middlewares globais ──────────────────────────────────────────
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
-app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true, methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'] }));
+app.use(cors({ 
+  origin: [
+    process.env.FRONTEND_URL,
+    'https://freelapay-repository-production.up.railway.app',
+  ],
+  credentials: true, 
+  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 app.use(compression());
 app.use(morgan('combined', { stream: { write: msg => logger.info(msg.trim()) } }));
 
