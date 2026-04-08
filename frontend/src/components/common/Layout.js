@@ -84,21 +84,15 @@ export default function Layout() {
         sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       )}>
         {/* Logo */}
-        <div className="p-6 border-b border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-              <Shield size={16} className="text-white" />
-            </div>
-            <div>
-              <span className="font-bold text-gray-900 text-lg">Free.API</span>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <div className={clsx('w-1.5 h-1.5 rounded-full', isConnected ? 'bg-green-500' : 'bg-gray-300')} />
-                <span className="text-xs text-gray-400">{isConnected ? 'Online' : 'Offline'}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
+        <div className="p-4 border-b border-gray-100">
+  <div className="flex items-center justify-between">
+    <img src="/logo.png" alt="FreelaPay" className="h-10 w-auto" />
+    <div className="flex items-center gap-1.5">
+      <div className={clsx('w-1.5 h-1.5 rounded-full', isConnected ? 'bg-green-500' : 'bg-gray-300')} />
+      <span className="text-xs text-gray-400">{isConnected ? 'Online' : 'Offline'}</span>
+    </div>
+  </div>
+</div>
         {/* Nav */}
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {navItems.map(({ to, icon: Icon, label }) => (
