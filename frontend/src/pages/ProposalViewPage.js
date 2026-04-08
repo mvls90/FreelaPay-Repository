@@ -111,7 +111,7 @@ export default function ProposalViewPage() {
               <div className="flex items-center gap-3 mt-1.5 text-sm text-gray-500">
                 <span className="flex items-center gap-1">
                   <Star size={13} className="text-yellow-400" />
-                  {proposal.freelancer_trust?.toFixed(1) || '—'}
+                  {proposal.freelancer_trust ? parseFloat(proposal.freelancer_trust).toFixed(1) : '—'}
                 </span>
                 <span>{proposal.freelancer_projects || 0} projetos concluídos</span>
               </div>
