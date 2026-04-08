@@ -7,7 +7,7 @@ ENV REACT_APP_API_URL=$REACT_APP_API_URL
 ENV REACT_APP_SOCKET_URL=$REACT_APP_SOCKET_URL
 
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 
 COPY . .
 RUN npm run build
