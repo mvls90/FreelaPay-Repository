@@ -24,17 +24,23 @@ export default function LoginPage() {
         return;
       }
       toast.success('Login realizado com sucesso!');
-      navigate('/dashboard');
+      const user = useAuthStore.getState().user;
+      if (user?.type === 'freelancer') navigate('/freelancer/dashboard');
+      else if (user?.type === 'client') navigate('/cliente/dashboard');
+      else navigate('/admin/dashboard');
     } catch (error) {
-      toast.error(error.response?.data?.error || 'Erro ao fazer login');
+      toast.error(error.response?.data?.error || 'E-mail ou senha incorretos');
     }
   };
 
   const onSubmit2FA = async (data) => {
     try {
-      const result = await login(formData.email, formData.password, data.totp_code);
+      await login(formData.email, formData.password, data.totp_code);
       toast.success('Login realizado!');
-      navigate('/dashboard');
+      const user = useAuthStore.getState().user;
+      if (user?.type === 'freelancer') navigate('/freelancer/dashboard');
+      else if (user?.type === 'client') navigate('/cliente/dashboard');
+      else navigate('/admin/dashboard');
     } catch (error) {
       toast.error(error.response?.data?.error || 'Código inválido');
     }
@@ -43,12 +49,8 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 bg-indigo-600 rounded-2xl mb-4 shadow-lg shadow-indigo-200">
-            <Shield size={28} className="text-white" />
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900">Free.API</h1>
+          <img src="/logo.png" alt="FreelaPay" className="h-20 w-auto mx-auto mb-2" />
           <p className="text-gray-500 text-sm mt-1">Plataforma segura de freelancers</p>
         </div>
 
