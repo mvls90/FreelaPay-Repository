@@ -41,7 +41,7 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <img src="/logo.png" alt="FreelaPay" className="h-10 w-auto mx-auto mb-2" />
+          <img src="/logo.png" alt="FreelaPay" className="h-15 w-auto mx-auto mb-2" />
           <p className="text-gray-500 text-sm mt-1">Crie sua conta grátis</p>
         </div>
 
