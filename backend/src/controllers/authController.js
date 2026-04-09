@@ -49,9 +49,14 @@ const register = async (req, res) => {
 
   const verificationToken = jwt.sign({ userId: result.id, purpose: 'email_verify' }, process.env.JWT_SECRET, { expiresIn: '24h' });
 
+try {
   await emailService.sendWelcomeEmail(result.email, result.full_name, verificationToken);
+} catch (emailError) {
+  logger.warn('E-mail de boas-vindas não enviado:', emailError.message);
+}
 
-  await query(
+await query(
+  
     `INSERT INTO audit_logs (user_id, action, entity_type, entity_id, ip_address)
      VALUES ($1, 'user_registered', 'user', $1, $2)`,
     [result.id, req.ip]
