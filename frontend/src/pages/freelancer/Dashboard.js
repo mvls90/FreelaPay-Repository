@@ -5,7 +5,7 @@ import { useAuthStore } from '../../store/index';
 import { projectAPI, paymentAPI, proposalAPI } from '../../services/api';
 import {
   TrendingUp, Clock, CheckCircle, AlertTriangle,
-  Plus, ArrowRight, DollarSign, Star
+  Plus, ArrowRight, DollarSign, Mail, X
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import clsx from 'clsx';
@@ -25,6 +25,9 @@ const StatusBadge = ({ status }) => {
 
 export default function FreelancerDashboard() {
   const { user } = useAuthStore();
+  const [bannerDismissed, setBannerDismissed] = React.useState(
+    localStorage.getItem('email_banner_dismissed') === 'true'
+  );
 
   const { data: projectsData } = useQuery('my-projects', () =>
     projectAPI.getAll({ limit: 5 }).then(r => r.data)
@@ -41,6 +44,11 @@ export default function FreelancerDashboard() {
   const balance = balanceData?.balance || {};
   const projects = projectsData?.projects || [];
   const proposals = proposalsData?.proposals || [];
+
+  const handleDismiss = () => {
+    localStorage.setItem('email_banner_dismissed', 'true');
+    setBannerDismissed(true);
+  };
 
   const stats = [
     {
@@ -88,6 +96,30 @@ export default function FreelancerDashboard() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
+
+      {/* Banner verificação de e-mail */}
+      {!user?.email_verified && !bannerDismissed && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Mail size={18} className="text-amber-600" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-amber-900">Verifique seu e-mail</p>
+              <p className="text-xs text-amber-700 mt-0.5">
+                Enviamos um link de verificação para <strong>{user?.email}</strong>. Verifique sua caixa de entrada e spam.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={handleDismiss}
+            className="text-amber-500 hover:text-amber-700 flex-shrink-0"
+          >
+            <X size={18} />
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -178,10 +210,7 @@ export default function FreelancerDashboard() {
                   {p.progress_pct > 0 && (
                     <div className="mt-2">
                       <div className="w-full bg-gray-100 rounded-full h-1">
-                        <div
-                          className="bg-indigo-500 h-1 rounded-full"
-                          style={{ width: `${p.progress_pct}%` }}
-                        />
+                        <div className="bg-indigo-500 h-1 rounded-full" style={{ width: `${p.progress_pct}%` }} />
                       </div>
                     </div>
                   )}
