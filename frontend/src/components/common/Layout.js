@@ -12,7 +12,7 @@ import clsx from 'clsx';
 const freelancerNav = [
   { to: '/freelancer/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/freelancer/propostas', icon: FileText, label: 'Propostas' },
-  { to: '/freelancer/projetos', icon: FolderOpen, label: 'Projetos' },
+  { to: '/freelancer/projetos', icon: FolderOpen, label: 'Projetos', badge: true },
   { to: '/freelancer/financeiro', icon: Wallet, label: 'Financeiro' },
   { to: '/freelancer/perfil', icon: User, label: 'Perfil' },
 ];
@@ -97,19 +97,19 @@ export default function Layout() {
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {navItems.map(({ to, icon: Icon, label }) => (
             <NavLink
-              key={to}
-              to={to}
-              onClick={() => setSidebarOpen(false)}
-              className={({ isActive }) => clsx(
-                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all',
-                isActive
-                  ? 'bg-indigo-50 text-indigo-700'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              )}
-            >
-              <Icon size={18} />
-              {label}
-            </NavLink>
+  key={to}
+  to={to}
+  onClick={() => setSidebarOpen(false)}
+  className={({ isActive }) => clsx(
+    'relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all',
+    isActive
+      ? 'bg-indigo-50 text-indigo-700'
+      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+  )}
+>
+  <Icon size={18} />
+  {label}
+</NavLink>
           ))}
         </nav>
 
