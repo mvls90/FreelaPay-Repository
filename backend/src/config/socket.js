@@ -29,21 +29,9 @@ module.exports = (io) => {
 
     socket.on('join_dispute', (disputeId) => socket.join(`dispute_${disputeId}`));
 
-    socket.on('send_message', async ({ projectId, content, attachments }) => {
-      const pr = await query('SELECT * FROM projects WHERE id=$1 AND (freelancer_id=$2 OR client_id=$2)', [projectId, userId]);
-      if (!pr.rows.length) return;
-      const project = pr.rows[0];
-      const receiverId = userId === project.freelancer_id ? project.client_id : project.freelancer_id;
-      const msgResult = await query(
-        'INSERT INTO messages (project_id, sender_id, receiver_id, content, attachments) VALUES ($1,$2,$3,$4,$5) RETURNING *',
-        [projectId, userId, receiverId, content, JSON.stringify(attachments || [])]
-      );
-      const msg = { ...msgResult.rows[0], sender_name: socket.user.full_name };
-      io.to(`project_${projectId}`).emit('new_message', msg);
-      const rSock = userSockets.get(receiverId);
-      if (rSock) io.to(rSock).emit('message_notification', { projectId, message: content.substring(0, 100), from: socket.user.full_name });
-      await query('UPDATE projects SET last_activity_at=NOW() WHERE id=$1', [projectId]);
-    });
+    socket.on('send_message', () => {
+  // Mensagens são salvas via API REST — ignorar aqui para evitar duplicação
+});
 
     socket.on('typing', ({ projectId }) => {
       socket.to(`project_${projectId}`).emit('user_typing', { userId, name: socket.user.full_name });
