@@ -56,6 +56,22 @@ export const SocketProvider = ({ children }) => {
       toast(`💬 ${from}: ${message}`, { duration: 4000 });
     });
 
+    // Fallback: notificação via new_message quando fora do chat
+    socket.on('new_message', (msg) => {
+      const isInChat = window.location.pathname.includes('/chat');
+      if (!isInChat && msg.sender_id !== user?.id) {
+        toast(`💬 ${msg.sender_name}: ${msg.content?.substring(0, 60)}`, { duration: 4000 });
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.connect(g); g.connect(ctx.destination);
+          o.frequency.value = 520; g.gain.value = 0.3;
+          o.start(); o.stop(ctx.currentTime + 0.15);
+        } catch {}
+      }
+    });
+
     socketRef.current = socket;
 
     return () => {
