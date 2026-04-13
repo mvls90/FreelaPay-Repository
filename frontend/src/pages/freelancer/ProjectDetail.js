@@ -81,9 +81,14 @@ export default function FreelancerProjectDetail() {
           <p className="text-sm text-gray-500 mt-0.5">Cliente: {project.client_name}</p>
         </div>
         <Link to={`/freelancer/projetos/${id}/chat`}
-          className="flex items-center gap-2 border border-gray-200 text-gray-700 hover:border-indigo-300 hover:text-indigo-600 px-4 py-2 rounded-xl text-sm font-medium transition-colors">
-          <MessageSquare size={15} /> Chat
-        </Link>
+  className="relative flex items-center gap-2 border border-gray-200 text-gray-700 hover:border-indigo-300 hover:text-indigo-600 px-4 py-2 rounded-xl text-sm font-medium transition-colors">
+  <MessageSquare size={15} /> Chat
+  {project.unread_messages > 0 && (
+    <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+      {project.unread_messages}
+    </span>
+  )}
+</Link>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
