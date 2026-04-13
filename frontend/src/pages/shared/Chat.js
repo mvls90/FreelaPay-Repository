@@ -27,6 +27,21 @@ const groupByDate = (messages) => {
   return groups;
 };
 
+// Som de notificação
+const playNotificationSound = () => {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.connect(g);
+    g.connect(ctx.destination);
+    o.frequency.value = 520;
+    g.gain.value = 0.3;
+    o.start();
+    o.stop(ctx.currentTime + 0.15);
+  } catch {}
+};
+
 export default function ChatPage() {
   const { id: projectId } = useParams();
   const navigate = useNavigate();
@@ -38,13 +53,14 @@ export default function ChatPage() {
   const [typingUser, setTypingUser] = useState(null);
   const messagesEndRef = useRef(null);
   const typingTimeoutRef = useRef(null);
+  const [toast, setToast] = useState(null);
 
   const { data: projectData } = useQuery(
     ['project', projectId],
     () => projectAPI.getById(projectId).then(r => r.data)
   );
 
-  const { data: messagesData, isLoading } = useQuery(
+  const { isLoading } = useQuery(
     ['messages', projectId],
     () => messageAPI.getProjectMessages(projectId).then(r => r.data),
     {
@@ -61,11 +77,17 @@ export default function ChatPage() {
     const unsub = onNewMessage((msg) => {
       setMessages(prev => {
         if (prev.find(m => m.id === msg.id)) return prev;
+        // Notificação apenas para mensagens de outros
+        if (msg.sender_id !== user.id) {
+          playNotificationSound();
+          setToast(`${msg.sender_name}: ${msg.content}`);
+          setTimeout(() => setToast(null), 4000);
+        }
         return [...prev, msg];
       });
     });
     return unsub;
-  }, [onNewMessage]);
+  }, [onNewMessage, user.id]);
 
   useEffect(() => {
     const unsub = onUserTyping(({ name, userId }) => {
@@ -89,49 +111,41 @@ export default function ChatPage() {
     setInput('');
     setIsSending(true);
 
-    // Otimistic update
-    const tempMsg = {
-      id: `temp-${Date.now()}`,
-      sender_id: user.id,
-      sender_name: user.full_name,
-      content,
-      created_at: new Date().toISOString(),
-      is_optimistic: true,
-    };
-    setMessages(prev => [...prev, tempMsg]);
-
     try {
+      // Salva via API (evita duplicação)
+      await messageAPI.send(projectId, { content });
       socketSendMessage(projectId, content);
-    } catch {}
-
-    setIsSending(false);
+    } catch {
+      setInput(content);
+    } finally {
+      setIsSending(false);
+    }
   };
 
-  const handleTyping = () => {
-    sendTyping(projectId);
-  };
+  const handleTyping = () => sendTyping(projectId);
 
   const project = projectData?.project;
   const otherName = user?.type === 'freelancer' ? project?.client_name : project?.freelancer_name;
-  const otherAvatar = user?.type === 'freelancer' ? project?.client_avatar : project?.freelancer_avatar;
 
   const grouped = groupByDate(messages);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-56px)]">
+    <div className="flex flex-col h-[calc(100vh-56px)] relative">
+      {/* Toast notificação */}
+      {toast && (
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 bg-indigo-600 text-white px-4 py-3 rounded-xl shadow-lg text-sm max-w-xs truncate animate-bounce">
+          💬 {toast}
+        </div>
+      )}
+
       {/* Header */}
       <div className="bg-white border-b border-gray-100 px-4 py-3 flex items-center gap-3 flex-shrink-0">
-        <button
-          onClick={() => navigate(-1)}
-          className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
-        >
+        <button onClick={() => navigate(-1)} className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
           <ArrowLeft size={18} className="text-gray-600" />
         </button>
-
         <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-semibold text-sm flex-shrink-0">
           {otherName?.charAt(0) || '?'}
         </div>
-
         <div className="flex-1 min-w-0">
           <p className="font-semibold text-sm text-gray-900 truncate">{otherName || 'Carregando...'}</p>
           <p className="text-xs text-gray-400 truncate">{project?.title}</p>
@@ -152,31 +166,26 @@ export default function ChatPage() {
                 <span className="text-xs text-gray-400 font-medium px-2">{date}</span>
                 <div className="flex-1 h-px bg-gray-100" />
               </div>
-
               {msgs.map((msg) => {
                 const isMe = msg.sender_id === user.id;
                 return (
-                  <div
-                    key={msg.id}
-                    className={clsx('flex mb-2', isMe ? 'justify-end' : 'justify-start')}
-                  >
+                  <div key={msg.id} className={clsx('flex mb-2', isMe ? 'justify-end' : 'justify-start')}>
                     {!isMe && (
                       <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-600 mr-2 mt-1 flex-shrink-0">
                         {msg.sender_name?.charAt(0)}
                       </div>
                     )}
-                    <div className={clsx('max-w-xs lg:max-w-md')}>
+                    <div className="max-w-xs lg:max-w-md">
                       <div className={clsx(
                         'px-4 py-2.5 rounded-2xl text-sm leading-relaxed',
                         isMe
-                          ? clsx('bg-indigo-600 text-white rounded-br-sm', msg.is_optimistic && 'opacity-70')
+                          ? 'bg-indigo-600 text-white rounded-br-sm'
                           : 'bg-white text-gray-900 border border-gray-100 rounded-bl-sm shadow-sm'
                       )}>
                         {msg.content}
                       </div>
                       <p className={clsx('text-xs mt-1', isMe ? 'text-right text-gray-400' : 'text-gray-400')}>
                         {formatMsgDate(msg.created_at)}
-                        {msg.is_optimistic && ' ·'}
                       </p>
                     </div>
                   </div>
@@ -186,7 +195,6 @@ export default function ChatPage() {
           ))
         )}
 
-        {/* Typing indicator */}
         {typingUser && (
           <div className="flex items-center gap-2 ml-9 mt-2">
             <div className="bg-white border border-gray-100 rounded-2xl rounded-bl-sm px-4 py-2.5 shadow-sm flex items-center gap-1">
@@ -197,29 +205,21 @@ export default function ChatPage() {
             <p className="text-xs text-gray-400">{typingUser} está digitando</p>
           </div>
         )}
-
         <div ref={messagesEndRef} />
       </div>
 
       {/* Input */}
       <div className="bg-white border-t border-gray-100 p-3 flex-shrink-0">
         <form onSubmit={handleSend} className="flex items-end gap-2">
-          <button type="button"
-            className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0">
+          <button type="button" className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0">
             <Paperclip size={18} />
           </button>
           <div className="flex-1 relative">
             <textarea
               value={input}
-              onChange={(e) => {
-                setInput(e.target.value);
-                handleTyping();
-              }}
+              onChange={(e) => { setInput(e.target.value); handleTyping(); }}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSend(e);
-                }
+                if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(e); }
               }}
               rows={1}
               className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none max-h-32 overflow-y-auto"
@@ -232,7 +232,7 @@ export default function ChatPage() {
             disabled={!input.trim() || isSending}
             className="p-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 text-white rounded-xl transition-colors flex-shrink-0"
           >
-            <Send size={16} />
+            {isSending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
           </button>
         </form>
         <p className="text-xs text-gray-400 mt-1.5 ml-10">Enter para enviar · Shift+Enter para nova linha</p>
