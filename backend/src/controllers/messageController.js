@@ -45,7 +45,11 @@ const sendMessage = async (req, res) => {
   await query('UPDATE projects SET last_activity_at = NOW() WHERE id = $1', [projectId]);
 
   const msg = { ...result.rows[0], sender_name: req.user.full_name };
-  if (req.io) req.io.to(`project_${projectId}`).emit('new_message', msg);
+  if (req.io && req.socketId) {
+  req.io.to(`project_${projectId}`).except(req.socketId).emit('new_message', msg);
+} else if (req.io) {
+  req.io.to(`project_${projectId}`).emit('new_message', msg);
+}
 
   res.status(201).json({ message: msg });
 };
