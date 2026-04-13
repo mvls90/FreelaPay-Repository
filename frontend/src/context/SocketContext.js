@@ -58,8 +58,7 @@ export const SocketProvider = ({ children }) => {
 
     // Fallback: notificação via new_message quando fora do chat
     socket.on('new_message', (msg) => {
-      const isInChat = window.location.pathname.includes('/chat');
-      if (!isInChat && msg.sender_id !== user?.id) {
+      if (msg.sender_id !== user?.id) {
         toast(`💬 ${msg.sender_name}: ${msg.content?.substring(0, 60)}`, { duration: 4000 });
         try {
           const ctx = new (window.AudioContext || window.webkitAudioContext)();
