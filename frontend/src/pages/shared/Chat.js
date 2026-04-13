@@ -111,11 +111,27 @@ export default function ChatPage() {
     setInput('');
     setIsSending(true);
 
+    // Update otimista — aparece imediatamente
+    const tempId = `temp-${Date.now()}`;
+    const tempMsg = {
+      id: tempId,
+      sender_id: user.id,
+      sender_name: user.full_name,
+      content,
+      created_at: new Date().toISOString(),
+    };
+    setMessages(prev => [...prev, tempMsg]);
+
     try {
-      // Salva via API (evita duplicação)
-      await messageAPI.send(projectId, { content });
-      socketSendMessage(projectId, content);
+      const res = await messageAPI.send(projectId, { content });
+      // Substitui a mensagem otimista pela real
+      const realMsg = res.data?.message;
+      if (realMsg) {
+        setMessages(prev => prev.map(m => m.id === tempId ? realMsg : m));
+      }
     } catch {
+      // Remove otimista em caso de erro
+      setMessages(prev => prev.filter(m => m.id !== tempId));
       setInput(content);
     } finally {
       setIsSending(false);
