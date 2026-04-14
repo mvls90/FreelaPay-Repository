@@ -1,20 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { authAPI } from '../../services/api';
+import { useAuthStore } from '../../store/index';
 import { Shield, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 
 export default function VerifyEmailPage() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
+  const { updateUser } = useAuthStore();
   const [status, setStatus] = useState('loading'); // loading | success | error
   const token = params.get('token');
 
   useEffect(() => {
     if (!token) { setStatus('error'); return; }
     authAPI.verifyEmail(token)
-      .then(() => { setStatus('success'); setTimeout(() => navigate('/dashboard'), 3000); })
+      .then(() => {
+        updateUser({ email_verified: true });
+        setStatus('success');
+        setTimeout(() => navigate('/dashboard'), 3000);
+      })
       .catch(() => setStatus('error'));
-  }, [token]);
+  }, [token]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">

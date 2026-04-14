@@ -46,7 +46,7 @@ export default function ChatPage() {
   const { id: projectId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuthStore();
-  const { joinProject, sendMessage: socketSendMessage, sendTyping, onNewMessage, onUserTyping } = useSocket();
+  const { joinProject, sendMessage: socketSendMessage, sendTyping, setActiveChatProject, onNewMessage, onUserTyping } = useSocket();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isSending, setIsSending] = useState(false);
@@ -71,18 +71,25 @@ export default function ChatPage() {
   useEffect(() => {
     joinProject(projectId);
     messageAPI.markRead(projectId).catch(() => {});
-  }, [projectId]);
+  }, [projectId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Informa ao SocketContext qual chat está aberto para suprimir toast duplicado
+  useEffect(() => {
+    setActiveChatProject(projectId);
+    return () => setActiveChatProject(null);
+  }, [projectId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const unsub = onNewMessage((msg) => {
       setMessages(prev => {
+        // Evita duplicatas exatas (mesmo id)
         if (prev.find(m => m.id === msg.id)) return prev;
-        // Notificação apenas para mensagens de outros
-        if (msg.sender_id !== user.id) {
-          playNotificationSound();
-          setToast(`${msg.sender_name}: ${msg.content}`);
-          setTimeout(() => setToast(null), 4000);
-        }
+        // Mensagens próprias: o update otimista + resposta da API já cuidam da UI.
+        // Ignorar o bounce-back do socket evita race condition com o tempId.
+        if (msg.sender_id === user.id) return prev;
+        playNotificationSound();
+        setToast(`${msg.sender_name}: ${msg.content}`);
+        setTimeout(() => setToast(null), 4000);
         return [...prev, msg];
       });
     });

@@ -11,7 +11,13 @@ export const SocketProvider = ({ children }) => {
   const { addNotification } = useNotificationStore();
   const socketRef = useRef(null);
   const [isConnected, setIsConnected] = useState(false);
+  // Rastreia salas de projeto para re-entrar após reconexão
+  const joinedProjectsRef = useRef(new Set());
+  // Projeto de chat atualmente aberto — suprime toast duplicado
+  const activeChatProjectRef = useRef(null);
 
+  // Dependência em user?.id (primitivo) evita reconexões desnecessárias
+  // quando outros campos do user mudam (ex: email_verified)
   useEffect(() => {
     if (!accessToken || !user) {
       if (socketRef.current) {
@@ -25,13 +31,15 @@ export const SocketProvider = ({ children }) => {
     const socket = io(process.env.REACT_APP_SOCKET_URL || 'http://localhost:3001', {
       auth: { token: accessToken },
       transports: ['websocket', 'polling'],
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      // reconnectionAttempts padrão = Infinity; não limitar para manter conexão
     });
 
     socket.on('connect', () => {
       setIsConnected(true);
       console.log('✅ Socket conectado');
+      // Re-entra em todas as salas de projeto após connect/reconexão
+      joinedProjectsRef.current.forEach(id => socket.emit('join_project', id));
     });
 
     socket.on('disconnect', () => {
@@ -51,8 +59,11 @@ export const SocketProvider = ({ children }) => {
       });
     });
 
-    // Mensagem recebida — notificação com som em qualquer página
-    socket.on('message_notification', ({ from, message }) => {
+    // Mensagem recebida — notificação com som em qualquer página.
+    // Suprimida quando o usuário já está visualizando o chat daquele projeto
+    // para evitar duplicação com a notificação interna do Chat.js.
+    socket.on('message_notification', ({ from, message, projectId }) => {
+      if (activeChatProjectRef.current === String(projectId)) return;
       toast(`💬 ${from}: ${message}`, { duration: 4000 });
       try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -67,21 +78,6 @@ export const SocketProvider = ({ children }) => {
       } catch {}
     });
 
-    // Fallback: notificação via new_message quando fora do chat
-    socket.on('new_message', (msg) => {
-      if (msg.sender_id !== user?.id) {
-        toast(`💬 ${msg.sender_name}: ${msg.content?.substring(0, 60)}`, { duration: 4000 });
-        try {
-          const ctx = new (window.AudioContext || window.webkitAudioContext)();
-          const o = ctx.createOscillator();
-          const g = ctx.createGain();
-          o.connect(g); g.connect(ctx.destination);
-          o.frequency.value = 520; g.gain.value = 0.3;
-          o.start(); o.stop(ctx.currentTime + 0.15);
-        } catch {}
-      }
-    });
-
     socketRef.current = socket;
 
     return () => {
@@ -89,12 +85,15 @@ export const SocketProvider = ({ children }) => {
       socketRef.current = null;
       setIsConnected(false);
     };
-  }, [accessToken, user]);
+  }, [accessToken, user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Entra na sala do projeto e salva o ID para re-entrada automática após reconexão
   const joinProject = (projectId) => {
+    joinedProjectsRef.current.add(String(projectId));
     if (socketRef.current?.connected) {
       socketRef.current.emit('join_project', projectId);
     }
+    // Se ainda não conectado, será re-emitido no handler 'connect' acima
   };
 
   const joinDispute = (disputeId) => {
@@ -113,6 +112,11 @@ export const SocketProvider = ({ children }) => {
     if (socketRef.current?.connected) {
       socketRef.current.emit('typing', { projectId });
     }
+  };
+
+  // Registra qual chat está aberto para suprimir toast duplicado de message_notification
+  const setActiveChatProject = (projectId) => {
+    activeChatProjectRef.current = projectId ? String(projectId) : null;
   };
 
   const onNewMessage = (callback) => {
@@ -138,6 +142,7 @@ export const SocketProvider = ({ children }) => {
       joinDispute,
       sendMessage,
       sendTyping,
+      setActiveChatProject,
       onNewMessage,
       onUserTyping,
       onDisputeMessage,
