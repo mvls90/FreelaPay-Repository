@@ -51,9 +51,20 @@ export const SocketProvider = ({ children }) => {
       });
     });
 
-    // Mensagem recebida
+    // Mensagem recebida — notificação com som em qualquer página
     socket.on('message_notification', ({ from, message }) => {
       toast(`💬 ${from}: ${message}`, { duration: 4000 });
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.frequency.value = 520;
+        g.gain.value = 0.3;
+        o.start();
+        o.stop(ctx.currentTime + 0.15);
+      } catch {}
     });
 
     // Fallback: notificação via new_message quando fora do chat

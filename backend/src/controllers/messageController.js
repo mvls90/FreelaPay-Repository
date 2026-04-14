@@ -48,17 +48,14 @@ const sendMessage = async (req, res) => {
     
     if (req.io) {
       req.io.to(`project_${projectId}`).emit('new_message', msg);
-      
-      // Notificação sonora para o destinatário
-      if (req.io.userSockets) {
-        const rSock = req.io.userSockets.get(receiverId);
-        if (rSock) {
-          req.io.to(rSock).emit('message_notification', {
-            projectId,
-            message: content.substring(0, 100),
-            from: req.user.full_name,
-          });
-        }
+
+      // Notificação direta ao destinatário em qualquer página
+      if (req.io.sendToUser) {
+        req.io.sendToUser(receiverId, 'message_notification', {
+          projectId,
+          message: content.substring(0, 100),
+          from: req.user.full_name,
+        });
       }
     }
     
