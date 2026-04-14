@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import { projectAPI } from '../../services/api';
 import { useAuthStore } from '../../store/index';
-import { FolderOpen, Clock, CheckCircle, AlertTriangle, ArrowRight } from 'lucide-react';
+import { FolderOpen, Clock, CheckCircle, AlertTriangle, ArrowRight, Mail, X } from 'lucide-react';
 import clsx from 'clsx';
 
 const STATUS_CFG = {
@@ -17,6 +17,15 @@ const STATUS_CFG = {
 
 export default function ClientDashboard() {
   const { user } = useAuthStore();
+  const [bannerDismissed, setBannerDismissed] = React.useState(
+    localStorage.getItem('email_banner_dismissed') === 'true'
+  );
+
+  const handleDismiss = () => {
+    localStorage.setItem('email_banner_dismissed', 'true');
+    setBannerDismissed(true);
+  };
+
   const { data } = useQuery('client-projects', () => projectAPI.getAll({ limit: 20 }).then(r => r.data));
   const projects = data?.projects || [];
 
@@ -32,6 +41,30 @@ export default function ClientDashboard() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
+
+      {/* Banner verificação de e-mail */}
+      {!user?.email_verified && !bannerDismissed && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Mail size={18} className="text-amber-600" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-amber-900">Verifique seu e-mail</p>
+              <p className="text-xs text-amber-700 mt-0.5">
+                Enviamos um link de verificação para <strong>{user?.email}</strong>. Verifique sua caixa de entrada e spam.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={handleDismiss}
+            className="text-amber-500 hover:text-amber-700 flex-shrink-0"
+          >
+            <X size={18} />
+          </button>
+        </div>
+      )}
+
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Olá, {user?.full_name?.split(' ')[0]}! 👋</h1>
         <p className="text-gray-500 text-sm mt-0.5">Acompanhe seus projetos contratados</p>
