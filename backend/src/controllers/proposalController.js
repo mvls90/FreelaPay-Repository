@@ -3,6 +3,7 @@ const { query, transaction } = require('../config/database');
 const notificationService = require('../services/notificationService');
 const emailService = require('../services/emailService');
 const logger = require('../config/logger');
+const { createContract } = require('./contractController');
 
 // POST /api/proposals - Criar proposta
 const createProposal = async (req, res) => {
@@ -131,6 +132,16 @@ const acceptProposal = async (req, res) => {
     return res.status(400).json({ error: 'Esta proposta não pode mais ser aceita' });
   }
 
+  // Buscar dados do freelancer e milestones para o contrato
+  const [freelancerResult, milestonesResult] = await Promise.all([
+    query('SELECT full_name FROM users WHERE id = $1', [proposal.freelancer_id]),
+    query('SELECT * FROM milestones WHERE proposal_id = $1 ORDER BY order_index', [proposal.id]),
+  ]);
+  const freelancerName = freelancerResult.rows[0]?.full_name || '';
+  const clientName = req.user.full_name || '';
+
+  const proposalWithMilestones = { ...proposal, milestones: milestonesResult.rows };
+
   const result = await transaction(async (client) => {
     await client.query(
       `UPDATE proposals SET status = 'accepted', client_id = $1, accepted_at = NOW() WHERE id = $2`,
@@ -151,7 +162,12 @@ const acceptProposal = async (req, res) => {
       ]
     );
 
-    return projectResult.rows[0];
+    const project = projectResult.rows[0];
+
+    // Criar contrato automaticamente
+    await createContract(client, proposalWithMilestones, project, freelancerName, clientName);
+
+    return project;
   });
 
   await notificationService.create(proposal.freelancer_id, 'proposal_accepted', {

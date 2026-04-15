@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { projectAPI } from '../../services/api';
 import toast from 'react-hot-toast';
-import { ArrowLeft, MessageSquare, CheckCircle2, XCircle, Loader2, AlertTriangle, Shield } from 'lucide-react';
+import { ArrowLeft, MessageSquare, CheckCircle2, XCircle, Loader2, AlertTriangle, Shield, ScrollText } from 'lucide-react';
 import clsx from 'clsx';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -76,6 +76,10 @@ export default function ClientProjectDetail() {
           </div>
           <p className="text-sm text-gray-500 mt-0.5">Freelancer: {project.freelancer_name}</p>
         </div>
+        <Link to={`/cliente/projetos/${id}/contrato`}
+          className="flex items-center gap-1.5 border border-gray-200 text-gray-700 hover:border-emerald-300 hover:text-emerald-700 px-3 py-2 rounded-xl text-sm font-medium transition-colors">
+          <ScrollText size={15} /> Contrato
+        </Link>
         <Link to={`/cliente/projetos/${id}/chat`}
           className="flex items-center gap-2 border border-gray-200 text-gray-700 hover:border-indigo-300 hover:text-indigo-600 px-4 py-2 rounded-xl text-sm font-medium transition-colors">
           <MessageSquare size={15} /> Chat

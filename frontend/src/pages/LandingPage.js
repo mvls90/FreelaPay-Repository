@@ -81,14 +81,14 @@ const STEPS = [
 ];
 
 const TOP_FREELANCERS = [
-  { initials: 'LF', color: 'bg-blue-500',   name: 'Lucas Ferreira',    area: 'Dev Full-Stack',   rating: 5.0, projects: 87, badge: 1 },
-  { initials: 'AM', color: 'bg-pink-500',    name: 'Ana Moraes',        area: 'UI/UX Design',     rating: 5.0, projects: 74, badge: 2 },
-  { initials: 'RO', color: 'bg-purple-500',  name: 'Rafael Oliveira',   area: 'Tráfego Pago',     rating: 4.9, projects: 63, badge: 3 },
-  { initials: 'CS', color: 'bg-orange-500',  name: 'Carla Santos',      area: 'Social Media',     rating: 4.9, projects: 58, badge: null },
-  { initials: 'MP', color: 'bg-green-600',   name: 'Marcos Pinto',      area: 'Dev Mobile',       rating: 4.8, projects: 52, badge: null },
-  { initials: 'JL', color: 'bg-rose-500',    name: 'Julia Lima',        area: 'Redação/Copywrite', rating: 4.8, projects: 47, badge: null },
-  { initials: 'TR', color: 'bg-teal-500',    name: 'Thiago Rocha',      area: 'Gestão de Projetos',rating: 4.7, projects: 41, badge: null },
-  { initials: 'BS', color: 'bg-yellow-600',  name: 'Beatriz Souza',     area: 'Design Gráfico',   rating: 4.7, projects: 38, badge: null },
+  { id: 'fake-1',  initials: 'LF', color: 'bg-blue-500',   name: 'Lucas Ferreira',    area: 'Dev Full-Stack',    rating: 5.0, projects: 87, badge: 1 },
+  { id: 'fake-4',  initials: 'AM', color: 'bg-pink-500',    name: 'Ana Moraes',        area: 'UI/UX Design',      rating: 5.0, projects: 74, badge: 2 },
+  { id: 'fake-10', initials: 'RO', color: 'bg-purple-500',  name: 'Rafael Oliveira',   area: 'Tráfego Pago',      rating: 4.9, projects: 63, badge: 3 },
+  { id: 'fake-7',  initials: 'CS', color: 'bg-orange-500',  name: 'Carla Santos',      area: 'Social Media',      rating: 4.9, projects: 58, badge: null },
+  { id: 'fake-2',  initials: 'MP', color: 'bg-green-600',   name: 'Marcos Pinto',      area: 'Dev Mobile',        rating: 4.8, projects: 52, badge: null },
+  { id: 'fake-12', initials: 'JL', color: 'bg-rose-500',    name: 'Julia Lima',        area: 'Redação/Copywrite', rating: 4.8, projects: 47, badge: null },
+  { id: 'fake-14', initials: 'TR', color: 'bg-teal-500',    name: 'Thiago Rocha',      area: 'Gestão de Projetos',rating: 4.7, projects: 41, badge: null },
+  { id: 'fake-5',  initials: 'BS', color: 'bg-yellow-600',  name: 'Beatriz Souza',     area: 'Design Gráfico',    rating: 4.7, projects: 38, badge: null },
 ];
 
 const CLIENT_BENEFITS = [
@@ -488,9 +488,9 @@ export default function LandingPage() {
                 <p className="text-xs text-gray-500 mb-2">{f.area}</p>
                 <Stars rating={f.rating} />
                 <p className="text-xs text-gray-400 mt-1.5">{f.projects} projetos concluídos</p>
-                <Link to="/cadastro"
+                <Link to={`/perfil/${f.id}`}
                   className="mt-4 block w-full py-2 rounded-lg bg-[#0A2540] text-white text-xs font-bold text-center hover:bg-[#0d3060] transition-colors">
-                  Contratar
+                  Ver Perfil
                 </Link>
               </div>
             ))}

@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import {
   ArrowLeft, MessageSquare, Send, CheckCircle2, Clock,
   Upload, AlertTriangle, RotateCcw, DollarSign, Loader2,
-  FileText, X, ChevronDown, ChevronUp
+  FileText, X, ChevronDown, ChevronUp, ScrollText
 } from 'lucide-react';
 import clsx from 'clsx';
 import { format } from 'date-fns';
@@ -80,6 +80,10 @@ export default function FreelancerProjectDetail() {
           </div>
           <p className="text-sm text-gray-500 mt-0.5">Cliente: {project.client_name}</p>
         </div>
+        <Link to={`/freelancer/projetos/${id}/contrato`}
+          className="flex items-center gap-1.5 border border-gray-200 text-gray-700 hover:border-emerald-300 hover:text-emerald-700 px-3 py-2 rounded-xl text-sm font-medium transition-colors">
+          <ScrollText size={15} /> Contrato
+        </Link>
         <Link to={`/freelancer/projetos/${id}/chat`}
   className="relative flex items-center gap-2 border border-gray-200 text-gray-700 hover:border-indigo-300 hover:text-indigo-600 px-4 py-2 rounded-xl text-sm font-medium transition-colors">
   <MessageSquare size={15} /> Chat

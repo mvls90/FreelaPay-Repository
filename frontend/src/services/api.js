@@ -127,6 +127,11 @@ export const userAPI = {
   getPublicProfile: (id) => api.get(`/users/${id}`),
 };
 
+export const contractAPI = {
+  getByProject: (projectId) => api.get(`/contracts/${projectId}`),
+  sign: (contractId) => api.post(`/contracts/${contractId}/sign`),
+};
+
 export const adminAPI = {
   getDashboard: () => api.get('/admin/dashboard'),
   getUsers: (params) => api.get('/admin/users', { params }),

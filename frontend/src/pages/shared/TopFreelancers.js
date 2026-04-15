@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../../store/index';
 import toast from 'react-hot-toast';
 
@@ -19,96 +19,96 @@ const CATEGORIES = [
 const FREELANCERS = [
   /* Desenvolvimento */
   {
-    id: 1, cat: 'dev', initials: 'LF', color: 'bg-blue-500',
+    id: 'fake-1', cat: 'dev', initials: 'LF', color: 'bg-blue-500',
     name: 'Lucas Ferreira', specialty: 'Dev Full-Stack (React + Node)',
     rating: 5.0, projects: 87, bio: 'Especialista em aplicações web escaláveis. +5 anos de mercado.',
     skills: ['React', 'Node.js', 'PostgreSQL'],
   },
   {
-    id: 2, cat: 'dev', initials: 'MP', color: 'bg-indigo-500',
+    id: 'fake-2', cat: 'dev', initials: 'MP', color: 'bg-indigo-500',
     name: 'Marcos Pinto', specialty: 'Dev Mobile (React Native)',
     rating: 4.9, projects: 62, bio: 'Apps iOS e Android de alta performance. Entregas no prazo.',
     skills: ['React Native', 'Firebase', 'TypeScript'],
   },
   {
-    id: 3, cat: 'dev', initials: 'FG', color: 'bg-cyan-600',
+    id: 'fake-3', cat: 'dev', initials: 'FG', color: 'bg-cyan-600',
     name: 'Felipe Gomes', specialty: 'Back-End & APIs',
     rating: 4.8, projects: 54, bio: 'APIs REST e GraphQL robustas. Python, Go e Node.',
     skills: ['Python', 'Go', 'Docker'],
   },
   /* Design */
   {
-    id: 4, cat: 'design', initials: 'AM', color: 'bg-pink-500',
+    id: 'fake-4', cat: 'design', initials: 'AM', color: 'bg-pink-500',
     name: 'Ana Moraes', specialty: 'UI/UX Design',
     rating: 5.0, projects: 74, bio: 'Interfaces que convertem. Figma e Framer expert.',
     skills: ['Figma', 'Framer', 'Design System'],
   },
   {
-    id: 5, cat: 'design', initials: 'BS', color: 'bg-rose-500',
+    id: 'fake-5', cat: 'design', initials: 'BS', color: 'bg-rose-500',
     name: 'Beatriz Souza', specialty: 'Design Gráfico & Branding',
     rating: 4.8, projects: 48, bio: 'Identidade visual que comunica valor. Atendo PMEs e startups.',
     skills: ['Illustrator', 'Photoshop', 'Branding'],
   },
   {
-    id: 6, cat: 'design', initials: 'VN', color: 'bg-fuchsia-500',
+    id: 'fake-6', cat: 'design', initials: 'VN', color: 'bg-fuchsia-500',
     name: 'Vanessa Nunes', specialty: 'Motion Design & Vídeo',
     rating: 4.7, projects: 35, bio: 'Animações e vídeos que prendem a atenção. After Effects.',
     skills: ['After Effects', 'Premiere', 'Lottie'],
   },
   /* Social Media */
   {
-    id: 7, cat: 'social', initials: 'CS', color: 'bg-orange-500',
+    id: 'fake-7', cat: 'social', initials: 'CS', color: 'bg-orange-500',
     name: 'Carla Santos', specialty: 'Social Media Manager',
     rating: 4.9, projects: 58, bio: 'Estratégia e gestão de redes sociais com foco em resultado.',
     skills: ['Instagram', 'TikTok', 'Analytics'],
   },
   {
-    id: 8, cat: 'social', initials: 'PL', color: 'bg-amber-500',
+    id: 'fake-8', cat: 'social', initials: 'PL', color: 'bg-amber-500',
     name: 'Pedro Lima', specialty: 'Criação de Conteúdo',
     rating: 4.8, projects: 42, bio: 'Conteúdo viral e engajador para marcas em crescimento.',
     skills: ['Copywriting', 'Canva', 'Reels'],
   },
   {
-    id: 9, cat: 'social', initials: 'IR', color: 'bg-yellow-600',
+    id: 'fake-9', cat: 'social', initials: 'IR', color: 'bg-yellow-600',
     name: 'Isabela Ramos', specialty: 'Gestão de Comunidade',
     rating: 4.7, projects: 31, bio: 'Community manager especializada em fidelização de audiência.',
     skills: ['Discord', 'WhatsApp Biz', 'E-mail Mktg'],
   },
   /* Tráfego Pago */
   {
-    id: 10, cat: 'trafego', initials: 'RO', color: 'bg-purple-500',
+    id: 'fake-10', cat: 'trafego', initials: 'RO', color: 'bg-purple-500',
     name: 'Rafael Oliveira', specialty: 'Google Ads & Meta Ads',
     rating: 4.9, projects: 63, bio: 'Campanhas que geram ROI real. Gerenciei +R$ 2M em verba.',
     skills: ['Google Ads', 'Meta Ads', 'Analytics'],
   },
   {
-    id: 11, cat: 'trafego', initials: 'DC', color: 'bg-violet-500',
+    id: 'fake-11', cat: 'trafego', initials: 'DC', color: 'bg-violet-500',
     name: 'Diego Costa', specialty: 'Performance & Funil',
     rating: 4.8, projects: 44, bio: 'Especialista em funil de vendas e otimização de conversão.',
     skills: ['Facebook Ads', 'Hotmart', 'CRO'],
   },
   /* Redação */
   {
-    id: 12, cat: 'redacao', initials: 'JL', color: 'bg-teal-500',
+    id: 'fake-12', cat: 'redacao', initials: 'JL', color: 'bg-teal-500',
     name: 'Julia Lima', specialty: 'Copywriting & SEO',
     rating: 4.8, projects: 57, bio: 'Textos que vendem e rankiam. Especialista em landing pages.',
     skills: ['SEO', 'Copywriting', 'Blogs'],
   },
   {
-    id: 13, cat: 'redacao', initials: 'GB', color: 'bg-emerald-500',
+    id: 'fake-13', cat: 'redacao', initials: 'GB', color: 'bg-emerald-500',
     name: 'Gabriel Barros', specialty: 'Redação Técnica',
     rating: 4.7, projects: 38, bio: 'Documentação técnica, manuais e conteúdo B2B de qualidade.',
     skills: ['Markdown', 'Confluence', 'Notion'],
   },
   /* Gestão */
   {
-    id: 14, cat: 'gestao', initials: 'TR', color: 'bg-green-600',
+    id: 'fake-14', cat: 'gestao', initials: 'TR', color: 'bg-green-600',
     name: 'Thiago Rocha', specialty: 'Gestão de Projetos',
     rating: 4.8, projects: 51, bio: 'Scrum Master certificado. Entregas dentro do prazo e orçamento.',
     skills: ['Scrum', 'Jira', 'Notion'],
   },
   {
-    id: 15, cat: 'gestao', initials: 'LA', color: 'bg-lime-600',
+    id: 'fake-15', cat: 'gestao', initials: 'LA', color: 'bg-lime-600',
     name: 'Lívia Alves', specialty: 'Consultoria Estratégica',
     rating: 4.7, projects: 29, bio: 'Planejamento estratégico e OKRs para startups e PMEs.',
     skills: ['OKR', 'Miro', 'Business Model'],
@@ -146,17 +146,6 @@ export default function TopFreelancers() {
     return matchCat && matchSearch;
   });
 
-  const handleMessage = (freelancer) => {
-    if (user?.type === 'client') {
-      toast.success(`Para contratar ${freelancer.name.split(' ')[0]}, solicite uma proposta pelo painel de projetos.`, {
-        duration: 4000,
-        icon: '💬',
-      });
-      navigate('/cliente/projetos');
-    } else {
-      toast(`Visualizando perfil de ${freelancer.name.split(' ')[0]}`, { icon: '👤' });
-    }
-  };
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
@@ -272,16 +261,16 @@ export default function TopFreelancers() {
                   </div>
 
                   {/* Action */}
-                  <button
-                    onClick={() => handleMessage(f)}
+                  <Link
+                    to={`/perfil/${f.id}`}
                     className="w-full py-2.5 rounded-xl bg-[#0A2540] text-white text-sm font-bold hover:bg-[#0d3060] transition-colors flex items-center justify-center gap-2"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                        d="M8 12h.01M12 12h.01M16 12h.01M21 3H3a2 2 0 00-2 2v14a2 2 0 002 2h18a2 2 0 002-2V5a2 2 0 00-2-2z" />
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
-                    {user?.type === 'client' ? 'Contratar' : 'Ver perfil'}
-                  </button>
+                    Ver Perfil
+                  </Link>
                 </div>
               </div>
             );

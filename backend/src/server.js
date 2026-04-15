@@ -23,6 +23,7 @@ const reviewRoutes       = require('./routes/reviews');
 const adminRoutes        = require('./routes/admin');
 const notificationRoutes = require('./routes/notifications');
 const webhookRoutes      = require('./routes/webhooks');
+const contractRoutes     = require('./routes/contracts');
 
 const app    = express();
 const server = http.createServer(app);
@@ -86,6 +87,7 @@ app.use('/api/reviews',       reviewRoutes);
 app.use('/api/admin',         adminRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/webhooks',      webhookRoutes);
+app.use('/api/contracts',     contractRoutes);
 
 // Health check
 app.get('/health', async (_req, res) => {

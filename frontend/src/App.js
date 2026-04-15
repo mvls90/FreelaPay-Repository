@@ -17,6 +17,8 @@ import LandingPage from './pages/LandingPage';
 
 // Shared extra
 import TopFreelancers from './pages/shared/TopFreelancers';
+import ContractPage from './pages/shared/Contract';
+import PublicProfile from './pages/PublicProfile';
 
 // Public
 import ProposalViewPage from './pages/ProposalViewPage';
@@ -125,6 +127,9 @@ export default function App() {
             {/* Proposta pública */}
             <Route path="/proposta/:link" element={<ProposalViewPage />} />
 
+            {/* Perfil público */}
+            <Route path="/perfil/:id" element={<PublicProfile />} />
+
             {/* Dashboard redirect */}
             <Route path="/dashboard" element={<ProtectedRoute><DashboardRedirect /></ProtectedRoute>} />
             <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
@@ -139,6 +144,7 @@ export default function App() {
               <Route path="projetos/:id/chat" element={<ChatPage />} />
               <Route path="financeiro" element={<FreelancerFinances />} />
               <Route path="top-freelancers" element={<TopFreelancers />} />
+              <Route path="projetos/:id/contrato" element={<ContractPage />} />
               <Route path="perfil" element={<FreelancerProfile />} />
               <Route path="notificacoes" element={<NotificationsPage />} />
               <Route path="disputas/:id" element={<DisputePage />} />
@@ -152,6 +158,7 @@ export default function App() {
               <Route path="projetos/:id/pagamento" element={<ClientPayment />} />
               <Route path="projetos/:id/chat" element={<ChatPage />} />
               <Route path="top-freelancers" element={<TopFreelancers />} />
+              <Route path="projetos/:id/contrato" element={<ContractPage />} />
               <Route path="perfil" element={<ClientProfile />} />
               <Route path="notificacoes" element={<NotificationsPage />} />
               <Route path="disputas/:id" element={<DisputePage />} />
