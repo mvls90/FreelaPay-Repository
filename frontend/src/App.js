@@ -15,6 +15,9 @@ import VerifyEmailPage from './pages/auth/VerifyEmailPage';
 // Landing
 import LandingPage from './pages/LandingPage';
 
+// Shared extra
+import TopFreelancers from './pages/shared/TopFreelancers';
+
 // Public
 import ProposalViewPage from './pages/ProposalViewPage';
 
@@ -135,6 +138,7 @@ export default function App() {
               <Route path="projetos/:id" element={<FreelancerProjectDetail />} />
               <Route path="projetos/:id/chat" element={<ChatPage />} />
               <Route path="financeiro" element={<FreelancerFinances />} />
+              <Route path="top-freelancers" element={<TopFreelancers />} />
               <Route path="perfil" element={<FreelancerProfile />} />
               <Route path="notificacoes" element={<NotificationsPage />} />
               <Route path="disputas/:id" element={<DisputePage />} />
@@ -147,6 +151,7 @@ export default function App() {
               <Route path="projetos/:id" element={<ClientProjectDetail />} />
               <Route path="projetos/:id/pagamento" element={<ClientPayment />} />
               <Route path="projetos/:id/chat" element={<ChatPage />} />
+              <Route path="top-freelancers" element={<TopFreelancers />} />
               <Route path="perfil" element={<ClientProfile />} />
               <Route path="notificacoes" element={<NotificationsPage />} />
               <Route path="disputas/:id" element={<DisputePage />} />

@@ -5,7 +5,7 @@ import { useSocket } from '../../context/SocketContext';
 import {
   LayoutDashboard, FileText, FolderOpen, MessageSquare,
   Bell, Wallet, User, LogOut, Menu, X, Shield,
-  Users, AlertTriangle, CreditCard, Download, ChevronDown
+  Users, AlertTriangle, CreditCard, Download, ChevronDown, Trophy
 } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -14,12 +14,14 @@ const freelancerNav = [
   { to: '/freelancer/propostas', icon: FileText, label: 'Propostas' },
   { to: '/freelancer/projetos', icon: FolderOpen, label: 'Projetos', badge: true },
   { to: '/freelancer/financeiro', icon: Wallet, label: 'Financeiro' },
+  { to: '/freelancer/top-freelancers', icon: Trophy, label: 'Top Freelancers' },
   { to: '/freelancer/perfil', icon: User, label: 'Perfil' },
 ];
 
 const clientNav = [
   { to: '/cliente/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/cliente/projetos', icon: FolderOpen, label: 'Meus Projetos' },
+  { to: '/cliente/top-freelancers', icon: Trophy, label: 'Top Freelancers' },
   { to: '/cliente/perfil', icon: User, label: 'Perfil' },
 ];
 
