@@ -12,6 +12,9 @@ import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import VerifyEmailPage from './pages/auth/VerifyEmailPage';
 
+// Landing
+import LandingPage from './pages/LandingPage';
+
 // Public
 import ProposalViewPage from './pages/ProposalViewPage';
 
@@ -121,7 +124,7 @@ export default function App() {
 
             {/* Dashboard redirect */}
             <Route path="/dashboard" element={<ProtectedRoute><DashboardRedirect /></ProtectedRoute>} />
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
 
             {/* Freelancer */}
             <Route path="/freelancer" element={<ProtectedRoute roles={['freelancer']}><Layout /></ProtectedRoute>}>
