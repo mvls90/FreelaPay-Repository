@@ -70,7 +70,11 @@ export default function PublicProfile() {
       navigate('/cadastro');
       return;
     }
-    toast('Para se comunicar com este freelancer, crie um projeto juntos.', { icon: '💬', duration: 4000 });
+    if (user?.type === 'client') {
+      navigate('/cliente/projetos');
+    } else if (user?.type === 'freelancer') {
+      navigate('/freelancer/projetos');
+    }
   };
 
   /* ── Mock profile ── */
@@ -184,10 +188,6 @@ function ProfileView({ name, specialty, rating, projects, bio, skills, initials,
                 <button onClick={onMessage}
                   className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 hover:border-[#0A2540] text-sm font-semibold transition-colors">
                   <MessageSquare size={15} /> Mensagem
-                </button>
-                <button onClick={onHire}
-                  className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#00C896] text-white text-sm font-bold hover:bg-[#00b386] transition-colors shadow-md shadow-[#00C896]/20">
-                  Contratar
                 </button>
               </div>
             </div>
