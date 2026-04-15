@@ -42,6 +42,7 @@ export default function PublicProfile() {
   const { user, accessToken } = useAuthStore();
 
   const isMock = id?.startsWith('fake-');
+  const isClientLoggedIn = !!accessToken && user?.type === 'client';
 
   // Buscar perfil real da API
   const { data, isLoading, error } = useQuery(
@@ -50,14 +51,20 @@ export default function PublicProfile() {
     { enabled: !isMock, retry: 1 }
   );
 
+  // Para clientes com freelancers reais: buscar projetos em comum
+  const { data: sharedProjectsData } = useQuery(
+    ['shared-projects', id],
+    () => api.get('/projects', { params: { freelancer_id: id, limit: 1 } }).then(r => r.data),
+    { enabled: isClientLoggedIn && !isMock, retry: 1 }
+  );
+
   const handleHire = () => {
     if (!accessToken) {
-      toast('Crie uma conta gratuita para contratar este freelancer!', { icon: '🔒' });
-      navigate('/cadastro');
+      navigate('/login');
       return;
     }
     if (user?.type === 'client') {
-      toast.success('Para contratar, crie um projeto e aguarde a proposta do freelancer.', { duration: 4000 });
+      toast.success('Para contratar, solicite uma proposta ao freelancer.', { duration: 4000 });
       navigate('/cliente/projetos');
     } else {
       toast('Apenas clientes podem contratar freelancers.', { icon: 'ℹ️' });
@@ -66,12 +73,24 @@ export default function PublicProfile() {
 
   const handleMessage = () => {
     if (!accessToken) {
-      toast('Faça login ou crie uma conta para enviar mensagens!', { icon: '💬' });
-      navigate('/cadastro');
+      navigate('/login');
       return;
     }
     if (user?.type === 'client') {
-      navigate('/cliente/projetos');
+      if (!isMock) {
+        // Freelancer real: redirecionar para o chat do projeto mais recente em comum
+        const projects = sharedProjectsData?.projects || [];
+        if (projects.length > 0) {
+          navigate(`/cliente/projetos/${projects[0].id}/chat`);
+          return;
+        }
+        // Sem projeto em comum ainda
+        toast('Você ainda não tem projetos com este freelancer.', { icon: '💬', duration: 3000 });
+        navigate('/cliente/projetos');
+      } else {
+        // Freelancer fictício: ir para a lista de projetos
+        navigate('/cliente/projetos');
+      }
     } else if (user?.type === 'freelancer') {
       navigate('/freelancer/projetos');
     }

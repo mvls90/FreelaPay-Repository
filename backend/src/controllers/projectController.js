@@ -4,7 +4,7 @@ const emailService = require('../services/emailService');
 
 // GET /api/projects - Listar projetos do usuário
 const getMyProjects = async (req, res) => {
-  const { status, page = 1, limit = 10 } = req.query;
+  const { status, page = 1, limit = 10, freelancer_id } = req.query;
   const offset = (page - 1) * limit;
   const isFreelancer = req.user.type === 'freelancer';
 
@@ -17,6 +17,12 @@ const getMyProjects = async (req, res) => {
   if (status) {
     whereClause += ` AND p.status = $${params.length + 1}`;
     params.push(status);
+  }
+
+  // Cliente pode filtrar por freelancer_id para encontrar projetos em comum
+  if (!isFreelancer && freelancer_id) {
+    whereClause += ` AND p.freelancer_id = $${params.length + 1}`;
+    params.push(freelancer_id);
   }
 
   const result = await query(
